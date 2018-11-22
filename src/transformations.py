@@ -1,5 +1,6 @@
 from pyspark.sql.functions import lag
 from pyspark.sql.window import Window
+from pyspark.sql.functions import lit
 
 
 def lagjoin(df, col, n):
@@ -16,3 +17,21 @@ def lagjoin(df, col, n):
 
     df = df.withColumnRenamed(col, col + '_0')  # denote t - 0 column
     return df
+
+def MA(df, col, n):
+    """
+    :param df: PySpark DataFrame
+    :param col: Base column name
+    :param n: window
+    :return: 
+    """
+    base = "MA_" + str(n)
+    adder = str(col) + '_'
+
+    all = [ adder + str(i) for i in range(n) ]
+    res = df.withColumn(base, sum(df[c] for c in all) / n )
+
+    for c in all:
+        res = res.drop(c)
+
+    return res
