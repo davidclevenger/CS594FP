@@ -120,7 +120,10 @@ def getSharpeRatio(buys, sells):
     # if cumProfit is '1', we really made no profit
     cumProfit -= 1
 
-    return (cumProfit - RISK_FREE_RATE) / np.std(returns)
+    if len(returns) == 1:
+        return (cumProfit - RISK_FREE_RATE) / 1
+    else:
+        return (cumProfit - RISK_FREE_RATE) / np.std(returns)
 
 
 def getSortinoRatio(buys, sells):
@@ -141,7 +144,10 @@ def getSortinoRatio(buys, sells):
     # if cumProfit is '1', we really made no profit
     cumProfit -= 1
 
-    return (cumProfit - RISK_FREE_RATE) / np.std(negReturns)
+    if len(negReturns) <= 1:
+        return (cumProfit - RISK_FREE_RATE) / 1
+    else:
+        return (cumProfit - RISK_FREE_RATE) / np.std(negReturns)
 
 def getSterlingRatio(buys, sells):
     if len(buys) != len(sells):
@@ -161,8 +167,11 @@ def getSterlingRatio(buys, sells):
     # if cumProfit is '1', we really made no profit
     cumProfit -= 1
 
-    return (cumProfit - RISK_FREE_RATE) / np.std(drawdowns)
-    
+    if len(drawdowns) <= 1:
+        return (cumProfit - RISK_FREE_RATE) / 1
+    else:
+        return (cumProfit - RISK_FREE_RATE) / np.std(drawdowns)
+
 # testing code
 if __name__ == "__main__":
     prices = np.array([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17])
