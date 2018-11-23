@@ -4,6 +4,9 @@ import numpy as np
 SELL = 0
 BUY = 1
 
+# annual average market return (expected)
+RISK_FREE_RATE = 0.07
+
 ####################################
 #           Strategies             #
 ####################################
@@ -101,7 +104,65 @@ def getAverageProfitPerTrade(buys, sells):
 
     return averageProfit
 
+def getSharpeRatio(buys, sells):
+    if len(buys) != len(sells):
+        raise ValueError("Incompatible dimensions")
 
+    cumProfit = 1
+    returns = []
+
+    # we could use cumulative profit function, but we would
+    # still need to retrieve the every asset returns
+    for buyPrice, sellPrice in zip(buys, sells):
+        cumProfit *= sellPrice / buyPrice
+        returns.append(sellPrice / buyPrice)
+
+    # if cumProfit is '1', we really made no profit
+    cumProfit -= 1
+
+    return (cumProfit - RISK_FREE_RATE) / np.std(returns)
+
+
+def getSortinoRatio(buys, sells):
+    if len(buys) != len(sells):
+        raise ValueError("Incompatible dimensions")
+
+    cumProfit = 1
+    negReturns = []
+
+    # we could use cumulative profit function, but we would
+    # still need to retrieve the negative asset returns
+    for buyPrice, sellPrice in zip(buys, sells):
+        cumProfit *= sellPrice / buyPrice
+
+        if buyPrice > sellPrice:
+            negReturns.append(sellPrice / buyPrice)
+
+    # if cumProfit is '1', we really made no profit
+    cumProfit -= 1
+
+    return (cumProfit - RISK_FREE_RATE) / np.std(negReturns)
+
+def getSterlingRatio(buys, sells):
+    if len(buys) != len(sells):
+        raise ValueError("Incompatible dimensions")
+
+    cumProfit = 1
+    drawdowns = []
+
+    # we could use cumulative profit function, but we would
+    # still need to retrieve the drawdowns
+    for buyPrice, sellPrice in zip(buys, sells):
+        cumProfit *= sellPrice / buyPrice
+
+        if buyPrice > sellPrice:
+            drawdowns.append(sellPrice - buyPrice)
+
+    # if cumProfit is '1', we really made no profit
+    cumProfit -= 1
+
+    return (cumProfit - RISK_FREE_RATE) / np.std(drawdowns)
+    
 # testing code
 if __name__ == "__main__":
     prices = np.array([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17])
