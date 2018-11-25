@@ -131,7 +131,7 @@ def getCumulativeProfit(buys, sells):
         cumProfit *= sellPrice / buyPrice
 
     # if cumProfit is '1', we really made no profit
-    cumProfit -= 1
+    cumProfit = (cumProfit - 1) / 100
 
     return cumProfit
 
