@@ -15,7 +15,12 @@ RISK_FREE_RATE = 0.07
 # each strategy function must produce a
 # tuple of buys and sells
 
-def getMACrossover(prices, ma1, ma2):
+def getMomentum(prices, ma1, ma2):
+    """
+    Momentum strategies assume price is trending when a
+    short term moving average crosses a long term moving
+    average.
+    """
     short = long = None
     if len(ma1) < len(ma2):
         short = ma2
@@ -53,6 +58,47 @@ def getMACrossover(prices, ma1, ma2):
 
     return buys, sells
 
+def getMeanReversion(prices, ma1, ma2):
+    """
+    Mean reversion strategies assume a security
+    is trending **abnormally** when a short term
+    moving average crosses a long term moving average
+    """
+    short = long = None
+    if len(ma1) < len(ma2):
+        short = ma2
+        long = ma1
+    else:
+        short = ma1
+        long = ma2
+
+    # truncate all 3 series to same length
+    trunc = len(long)
+    prices = prices[len(prices) - trunc:]
+    short = short[len(short) - trunc:]
+
+    buys, sells = [], []
+    side = BUY
+
+    # Long only - find first buy signal
+    for i in range(1, len(prices)):
+
+        if side == BUY:
+            if short[i - 1] > long[i - 1] and short[i] <= long[i]:  # buy signal
+                buys.append(prices[i])
+                side = SELL
+
+        else:  # side == SELL
+            if short[i - 1] <= long[i - 1] and short[i] > long[i]:  # sell signal
+                sells.append(prices[i])
+                side = BUY
+
+    # if last sell signal was not generated,
+    # sell on last period
+    if len(buys) > len(sells):
+        sells.append(prices[len(prices) - 1])
+
+    return buys, sells
 
 def getBuyAndHold(prices):
     """
