@@ -1,8 +1,0 @@
-<!-- https://mvnrepository.com/artifact/com.twosigma/flint -->
-<dependency>
-    <groupId>com.twosigma</groupId>
-    <artifactId>flint</artifactId>
-    <version>0.6.0</version>
-</dependency>
-
-
